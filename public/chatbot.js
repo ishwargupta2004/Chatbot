@@ -1,6 +1,6 @@
 (function () {
   // ─── Config ───────────────────────────────────────────────────────
-  const API_URL = "http://localhost:3000/api/chat"; // 👈 apna domain lagao
+  const API_URL = "https://chatbot-psi-gray.vercel.app/api/chat"; // 👈 apna domain lagao
   const scriptTag = document.currentScript;
   const ownerId = scriptTag.getAttribute("data-owner-id");
 
@@ -9,15 +9,16 @@
     return;
   }
 
-  // ─── Inject Styles ────────────────────────────────────────────────
+  // ─── Styles ───────────────────────────────────────────────────────
   const style = document.createElement("style");
   style.textContent = `
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap');
 
+    /* ── Toggle Button ── */
     #cw-btn {
       position: fixed;
-      bottom: 28px;
-      right: 28px;
+      bottom: 24px;
+      right: 24px;
       width: 56px;
       height: 56px;
       border-radius: 50%;
@@ -38,31 +39,60 @@
       box-shadow: 0 6px 28px rgba(37,99,235,0.55);
     }
 
-    #cw-box {
-      position: fixed;
-      bottom: 96px;
-      right: 28px;
-      width: 360px;
-      height: 520px;
-      border-radius: 20px;
-      background: #ffffff;
-      box-shadow: 0 12px 48px rgba(0,0,0,0.15);
-      display: none;
-      flex-direction: column;
-      z-index: 99998;
-      overflow: hidden;
-      font-family: 'DM Sans', sans-serif;
-      border: 1px solid rgba(0,0,0,0.07);
-      animation: cw-pop 0.25s ease;
+    /* ── Chat Box — Desktop ── */
+   #cw-box {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  width: 360px;
+  height: min(520px, calc(100dvh - 120px)); // screen se bahar nahi jaayega
+  max-height: 600px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+  display: none;
+  flex-direction: column;
+  z-index: 99998;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  border: 1px solid rgba(0,0,0,0.07);
+  animation: cw-pop 0.25s ease;
+}
+
+    /* ── Chat Box — Mobile: float above button, fully visible ── */
+    @media (max-width: 480px) {
+      #cw-box {
+        top: auto;
+        bottom: 84px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        height: calc(100dvh - 110px);
+        max-height: 560px;
+        border-radius: 16px;
+        animation: cw-slide 0.25s ease;
+      }
+      #cw-btn {
+        bottom: 16px;
+        right: 16px;
+        width: 52px;
+        height: 52px;
+      }
     }
+
     @keyframes cw-pop {
       from { opacity: 0; transform: translateY(12px) scale(0.97); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
+    @keyframes cw-slide {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
+    /* ── Header ── */
     #cw-header {
       background: linear-gradient(135deg, #1d4ed8, #2563eb);
-      padding: 16px 18px;
+      padding: 14px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -99,8 +129,8 @@
       background: rgba(255,255,255,0.15);
       border: none;
       color: white;
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       font-size: 16px;
       cursor: pointer;
@@ -112,10 +142,11 @@
     }
     #cw-close:hover { background: rgba(255,255,255,0.28); }
 
+    /* ── Messages Area ── */
     #cw-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 16px 14px;
+      padding: 14px 12px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -125,8 +156,9 @@
     #cw-messages::-webkit-scrollbar { width: 4px; }
     #cw-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
+    /* ── Bubbles ── */
     .cw-bubble {
-      max-width: 82%;
+      max-width: 80%;
       padding: 10px 14px;
       border-radius: 16px;
       font-size: 14px;
@@ -134,6 +166,11 @@
       word-break: break-word;
       animation: cw-fade 0.2s ease;
     }
+    /* Mobile: slightly larger font for readability */
+    @media (max-width: 480px) {
+      .cw-bubble { font-size: 15px; max-width: 85%; }
+    }
+
     @keyframes cw-fade {
       from { opacity: 0; transform: translateY(6px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -157,15 +194,8 @@
       align-self: flex-start;
       border-bottom-left-radius: 4px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
-    .cw-dots {
-      display: flex;
-      gap: 4px;
-    }
+    .cw-dots { display: flex; gap: 4px; }
     .cw-dots span {
       width: 6px;
       height: 6px;
@@ -180,8 +210,9 @@
       40%           { transform: translateY(-5px); }
     }
 
+    /* ── Footer / Input ── */
     #cw-footer {
-      padding: 12px 14px;
+      padding: 10px 12px;
       background: white;
       border-top: 1px solid #e2e8f0;
       display: flex;
@@ -189,23 +220,32 @@
       gap: 8px;
       flex-shrink: 0;
     }
+    /* Mobile: bigger input area, easier to tap */
+    @media (max-width: 480px) {
+      #cw-footer { padding: 12px 14px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+    }
     #cw-input {
       flex: 1;
       border: 1.5px solid #e2e8f0;
       border-radius: 12px;
-      padding: 9px 14px;
+      padding: 10px 14px;
       font-size: 14px;
       font-family: 'DM Sans', sans-serif;
       color: #1e293b;
       outline: none;
       background: #f8fafc;
       transition: border-color 0.2s;
+      min-width: 0; /* important for flex shrink */
+    }
+    @media (max-width: 480px) {
+      #cw-input { font-size: 16px; padding: 12px 14px; } /* 16px prevents iOS zoom */
     }
     #cw-input:focus { border-color: #2563eb; background: white; }
     #cw-input::placeholder { color: #94a3b8; }
+
     #cw-send {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 12px;
       background: #2563eb;
       border: none;
@@ -217,6 +257,9 @@
       justify-content: center;
       flex-shrink: 0;
       transition: background 0.2s, transform 0.15s;
+    }
+    @media (max-width: 480px) {
+      #cw-send { width: 44px; height: 44px; } /* bigger tap target on mobile */
     }
     #cw-send:hover { background: #1d4ed8; transform: scale(1.05); }
     #cw-send:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
@@ -277,6 +320,11 @@
     button.innerHTML = "💬";
   };
 
+  // ─── Mobile Check ─────────────────────────────────────────────────
+  function isMobile() {
+    return window.innerWidth <= 480;
+  }
+
   // ─── Add Message ──────────────────────────────────────────────────
   function addMessage(text, from) {
     const bubble = document.createElement("div");
@@ -312,8 +360,8 @@
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },  // ✅ fixed typo
-        body: JSON.stringify({ message: text, ownerId }),  // ✅ fixed JSON.stringify
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, ownerId }),
       });
 
       const data = await res.json();
@@ -331,7 +379,7 @@
   }
 
   // ─── Events ───────────────────────────────────────────────────────
-  sendBtn.onclick = sendMessage;  // ✅ onclick not onClick
+  sendBtn.onclick = sendMessage;
 
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();
