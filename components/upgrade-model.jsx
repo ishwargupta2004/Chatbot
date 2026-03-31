@@ -22,15 +22,14 @@ export default function UpgradeModal({ isOpen, onClose, trigger = "limit" }) {
             <DialogTitle className="text-2xl">Upgrade to Pro</DialogTitle>
           </div>
           <DialogDescription>
-            {trigger === "header" && "Create Unlimited Events with Pro! "}
+            {trigger === "header" && "Unlock unlimited chats and premium features! "}
             {trigger === "limit" && "You've reached your free event limit. "}
             {trigger === "color" && "Custom theme colors are a Pro feature. "}
-            Unlock unlimited chats and premium features!
           </DialogDescription>
         </DialogHeader>
 
         {/* Pricing Cards */}
-        
+
         <PricingTable
           checkoutProps={{
             appearance: {
@@ -42,7 +41,7 @@ export default function UpgradeModal({ isOpen, onClose, trigger = "limit" }) {
             },
           }}
         />
-      
+
 
         {/* Footer */}
         <div className="flex gap-3">

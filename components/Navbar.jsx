@@ -10,6 +10,8 @@ import { Badge } from "./ui/badge";
 import UpgradeModal from "./upgrade-model";
 import { motion } from "framer-motion";
 
+import { usePathname } from "next/navigation";
+import { Crown } from "lucide-react";
 
 export default function Header() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -17,12 +19,13 @@ export default function Header() {
 
   const { has } = useAuth();
   const hasPro = has?.({ plan: "pro" });
+  const pathname = usePathname();
 
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-xl  z-20 border-b">
-        <motion.div initial={{y:-50}} animate={{y:0}} transition={{duration:0.5}}
-         className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <motion.div initial={{ y: -50 }} animate={{ y: 0 }} transition={{ duration: 0.5 }}
+          className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
           {/* Logo */}
           <Link href="/" className="flex items-center">
@@ -65,11 +68,17 @@ export default function Header() {
             </Show>
 
             <Show when="signed-in">
-              {/* Create Event Button */}
+              {/* Dashboard Button and Embed-button */} 
               <Button size="sm" asChild className="flex gap-2 mr-4">
-                <Link href="/dashboard">
-                  <span className="font-bold sm:inline">Dashboard</span>
-                </Link>
+                {pathname === "/dashboard" ? (
+                  <Link href="/embed-page">
+                    <span className="font-bold sm:inline">Embed Page</span>
+                  </Link>
+                ) : (
+                  <Link href="/dashboard">
+                    <span className="font-bold sm:inline">Dashboard</span>
+                  </Link>
+                )}
               </Button>
 
               {/* User Button */}
